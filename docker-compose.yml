@@ -1,0 +1,21 @@
+services:
+  emby-rss-virtual:
+    build: .
+    container_name: emby-rss-virtual
+    restart: unless-stopped
+    ports:
+      - "8080:8080"
+    environment:
+      - TZ=Asia/Shanghai
+      - APP_CONFIG=/config/rules.yaml
+      - MEDIA_ROOT=/media
+      - VIRTUAL_ROOT=/virtual
+      - CRON_EXPR=30 3 * * *
+      - APP_DB=/data/app.db
+      - TMDB_API_KEY=your_tmdb_api_key
+      - TRAKT_CLIENT_ID=your_trakt_client_id
+    volumes:
+      - ./config:/config
+      - ./data:/data
+      - /path/to/your/real/library:/media:ro
+      - /path/to/your/virtual/library:/virtual

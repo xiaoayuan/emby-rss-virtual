@@ -1,0 +1,22 @@
+settings:
+  max_scan_files: 200000
+  video_exts: [".mkv", ".mp4", ".avi", ".ts", ".m2ts", ".strm"]
+
+rules:
+  - name: 国剧追更
+    enabled: true
+    target_subdir: rss-国产剧追更
+    max_items: 80
+    rss_urls:
+      - https://example.com/chinese-tv.rss
+    include_keywords: ["国剧", "国产", "更新", "S01", "第"]
+    exclude_keywords: ["预告", "花絮"]
+
+  - name: 奈飞榜单
+    enabled: true
+    target_subdir: rss-奈飞榜单
+    max_items: 60
+    rss_urls:
+      - https://example.com/netflix-top.rss
+    include_keywords: ["Netflix", "奈飞", "网飞"]
+    exclude_keywords: []

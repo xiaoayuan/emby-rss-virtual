@@ -1,0 +1,234 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Emby 虚拟库控制台</title>
+  <style>
+    :root{--bg:#0b1220;--panel:#111a2c;--card:#1a2540;--text:#d7e2ff;--muted:#8ea2d9;--accent:#4f8cff;--ok:#30c076;--warn:#f4b740;--danger:#f25f6b}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto;color:var(--text);background:linear-gradient(180deg,#090f1b,#0b1220)}
+    .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+    .side{padding:20px;border-right:1px solid #1e2a48;background:#0d1628}
+    .brand{font-size:22px;font-weight:700;padding:8px 10px;border:1px solid #2a3a66;border-radius:10px;display:inline-block}
+    .nav{margin-top:20px;display:grid;gap:8px}.nav a{color:var(--muted);text-decoration:none;padding:10px 12px;border-radius:10px;display:block;background:#111a2c}
+    .main{padding:24px}.top{display:flex;justify-content:space-between;align-items:center;gap:12px}
+    .btn{background:var(--accent);border:0;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .grid4{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px;margin-top:16px}
+    .card{background:var(--card);border:1px solid #2b3c67;border-radius:14px;padding:14px}
+    .label{color:var(--muted);font-size:12px}.value{font-size:28px;font-weight:700;margin-top:6px}
+    .panels{display:grid;grid-template-columns:1.2fr 1fr;gap:14px;margin-top:14px}
+    .panel{background:var(--panel);border:1px solid #26375f;border-radius:14px;padding:14px}
+    h3{margin:0 0 10px} table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:8px;border-bottom:1px solid #223355;text-align:left}
+    input,select{width:100%;background:#0f1830;color:#dfe8ff;border:1px solid #29406f;border-radius:8px;padding:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+    .actions{display:flex;gap:6px;align-items:center}.mini{padding:6px 10px;border-radius:8px;border:0;cursor:pointer}
+    .ok{background:var(--ok);color:#052014}.warn{background:var(--warn);color:#2a1a00}.danger{background:var(--danger);color:#fff}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">🎬 Emby Virtual</div>
+    <div class="nav">
+      <a href="#dashboard">主面板</a>
+      <a href="#sources">RSS来源</a>
+      <a href="#rules">规则引擎</a>
+      <a href="#emby">Emby联动</a>
+      <a href="#system">系统设置</a>
+      <a href="#runs">最近运行</a>
+    </div>
+  </aside>
+
+  <main class="main">
+    <section id="dashboard" class="top">
+      <div>
+        <h2 style="margin:0">媒体虚拟库控制台</h2>
+        <div class="muted">真实库：{{ media_root }} ｜ 虚拟库：{{ virtual_root }}</div>
+      </div>
+      <form method="post" action="/run"><button class="btn">立即刷新</button></form>
+    </section>
+
+    <section class="grid4">
+      <div class="card"><div class="label">RSS来源总数</div><div class="value">{{ sources|length }}</div></div>
+      <div class="card"><div class="label">启用来源</div><div class="value">{{ enabled_sources }}</div></div>
+      <div class="card"><div class="label">规则总数</div><div class="value">{{ rules|length }}</div></div>
+      <div class="card"><div class="label">启用规则</div><div class="value">{{ enabled_rules }}</div></div>
+    </section>
+
+    <section class="panels">
+      <div class="panel" id="sources">
+        <h3>RSS来源管理</h3>
+        <form method="post" action="/sources">
+          <div class="row3">
+            <input name="name" placeholder="来源名称（如 Netflix TOP）" required />
+            <select name="kind">
+              <option value="rss">RSS</option>
+              <option value="tmdb">TMDB(需 TMDB_API_KEY)</option>
+              <option value="trakt">Trakt(需 TRAKT_CLIENT_ID)</option>
+              <option value="justwatch">JustWatch(best-effort)</option>
+            </select>
+            <input name="platform" placeholder="平台标签（Netflix/HBO）" />
+          </div>
+          <div class="row">
+            <input name="rss_url" placeholder="RSS URL 或参数（如 media=tv&region=US&provider=8&limit=30）" required />
+            <button class="btn" type="submit">新增来源</button>
+          </div>
+        </form>
+
+        <div class="row" style="margin-top:6px">
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="netflix"/><button class="mini ok">+ Netflix</button></form>
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="hbo"/><button class="mini ok">+ HBO/Max</button></form>
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="disney"/><button class="mini ok">+ Disney+</button></form>
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="appletv"/><button class="mini ok">+ AppleTV+</button></form>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="trakt_shows"/><button class="mini ok">+ Trakt 热门剧集</button></form>
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="tmdb_movie"/><button class="mini ok">+ TMDB 热门电影</button></form>
+        </div>
+        <div class="row" style="margin-top:6px">
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="jw_hk_netflix_popular"/><button class="mini ok">+ JW港区奈飞热门</button></form>
+          <form method="post" action="/sources/preset"><input type="hidden" name="code" value="jw_hk_netflix_latest"/><button class="mini ok">+ JW港区奈飞最新</button></form>
+        </div>
+        <div class="muted" style="margin:6px 0 10px">注：TMDB/Trakt 预设可直接用（需环境变量密钥）；JustWatch 为 best-effort，地区/可用性可能变化。</div>
+
+        <table>
+          <thead><tr><th>ID</th><th>名称</th><th>平台</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+          {% for s in sources %}
+            <tr>
+              <td>{{ s.id }}</td>
+              <td>{{ s.name }}<div class="muted">{{ s.rss_url }}</div></td>
+              <td>{{ s.platform or '-' }}</td>
+              <td>{{ '启用' if s.enabled else '停用' }}</td>
+              <td class="actions">
+                <form method="post" action="/sources/{{ s.id }}/test"><button class="mini ok">测试</button></form>
+                <form method="post" action="/sources/{{ s.id }}/toggle"><button class="mini warn">切换</button></form>
+                <form method="post" action="/sources/{{ s.id }}/delete" onsubmit="return confirm('删除该来源?')"><button class="mini danger">删除</button></form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+
+      <div class="panel" id="rules">
+        <h3>规则管理</h3>
+        <form method="post" action="/rules">
+          <div class="row"><input name="name" placeholder="规则名" required /><input name="target_subdir" placeholder="输出目录名（如 rss-奈飞榜单）" required /></div>
+          <div class="row"><input name="source_ids" placeholder="来源ID列表，逗号分隔，如 3,5,8" required /><input name="max_items" type="number" min="1" value="80" /></div>
+          <div class="row"><input name="include_keywords" placeholder="包含关键词，逗号分隔" /><input name="exclude_keywords" placeholder="排除关键词，逗号分隔" /></div>
+          <button class="btn" type="submit">新增规则</button>
+        </form>
+
+        <table>
+          <thead><tr><th>ID</th><th>规则</th><th>来源</th><th>状态</th><th>操作</th></tr></thead>
+          <tbody>
+          {% for r in rules %}
+            <tr>
+              <td>{{ r.id }}</td>
+              <td>{{ r.name }}<div class="muted">{{ r.target_subdir }}</div></td>
+              <td>{{ r.source_ids }}</td>
+              <td>{{ '启用' if r.enabled else '停用' }}</td>
+              <td class="actions">
+                <form method="post" action="/rules/{{ r.id }}/preview"><button class="mini ok">预览</button></form>
+                <form method="post" action="/rules/{{ r.id }}/toggle"><button class="mini warn">切换</button></form>
+                <form method="post" action="/rules/{{ r.id }}/delete" onsubmit="return confirm('删除该规则?')"><button class="mini danger">删除</button></form>
+              </td>
+            </tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="panel" style="margin-top:14px">
+      <h3>测试与预览</h3>
+      <div class="row">
+        <div>
+          <div class="muted">最近来源测试：{{ (last_source_test and last_source_test.at) or '暂无' }}</div>
+          {% if last_source_test %}
+            <div><b>{{ last_source_test.source }}</b> 抓取 {{ last_source_test.count }} 条</div>
+            <div class="muted">{{ last_source_test.sample }}</div>
+          {% endif %}
+        </div>
+        <div>
+          <div class="muted">最近规则预览：{{ (last_rule_preview and last_rule_preview.at) or '暂无' }}</div>
+          {% if last_rule_preview %}
+            <div><b>{{ last_rule_preview.rule }}</b> 命中 {{ last_rule_preview.count }} 条</div>
+            <div class="muted">{{ last_rule_preview.sample }}</div>
+          {% endif %}
+        </div>
+      </div>
+    </section>
+
+    <section class="panel" id="emby" style="margin-top:14px">
+      <h3>Emby 联动</h3>
+      <form method="post" action="/emby/settings">
+        <div class="row">
+          <input name="emby_url" placeholder="Emby地址，如 http://192.168.1.10:8096" value="{{ emby_url }}" />
+          <input name="emby_api_key" placeholder="Emby API Key（保存后仅存本地）" />
+        </div>
+        <div class="row">
+          <select name="emby_auto_refresh">
+            <option value="0" {% if emby_auto_refresh != '1' %}selected{% endif %}>刷新虚拟库后 不自动通知Emby</option>
+            <option value="1" {% if emby_auto_refresh == '1' %}selected{% endif %}>刷新虚拟库后 自动通知Emby扫描</option>
+          </select>
+          <button class="btn" type="submit">保存 Emby 设置</button>
+        </div>
+      </form>
+      <form method="post" action="/emby/refresh"><button class="mini ok">立即触发 Emby 扫描</button></form>
+      <div class="muted" style="margin-top:8px">最近Emby刷新结果：{{ last_emby_refresh or '暂无' }}</div>
+    </section>
+
+    <section class="panel" id="system" style="margin-top:14px">
+      <h3>系统设置（全 Web）</h3>
+      <form method="post" action="/system/settings">
+        <div class="row">
+          <input name="cron_expr" value="{{ cron_expr }}" placeholder="Cron 表达式，如 30 3 * * *" />
+          <input name="max_scan_files" value="{{ max_scan_files }}" placeholder="最大扫描文件数" />
+        </div>
+        <div class="row">
+          <input name="video_exts" value="{{ video_exts }}" placeholder="视频后缀，逗号分隔（建议含 .strm）" />
+          <input name="tmdb_api_key" value="{{ tmdb_api_key }}" placeholder="TMDB API KEY" />
+        </div>
+        <div class="row">
+          <input name="trakt_client_id" value="{{ trakt_client_id }}" placeholder="TRAKT CLIENT ID" />
+          <select name="prefer_local_over_strm">
+            <option value="1" {% if prefer_local_over_strm == '1' %}selected{% endif %}>同名优先本地实体文件（推荐）</option>
+            <option value="0" {% if prefer_local_over_strm != '1' %}selected{% endif %}>同名优先 STRM</option>
+          </select>
+        </div>
+        <div class="row">
+          <div class="muted">实体与 STRM 并存时的优先策略可在这里切换。</div>
+          <button class="btn" type="submit">保存系统设置</button>
+        </div>
+      </form>
+      <div class="muted">现在除挂载路径/端口外，大部分配置都可在 Web 内完成。</div>
+    </section>
+
+    <section class="panel" id="runs" style="margin-top:14px">
+      <h3>最近运行结果</h3>
+      <div class="muted">最近执行时间：{{ last_run or '尚未执行' }}</div>
+      <table>
+        <thead><tr><th>规则</th><th>链接数</th><th>错误数</th><th>输出路径</th></tr></thead>
+        <tbody>
+        {% for x in last_result %}
+          <tr><td>{{ x.rule }}</td><td>{{ x.linked }}</td><td>{{ x.errors }}</td><td>{{ x.target }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+      <h3 style="margin-top:12px">运行日志</h3>
+      <table>
+        <thead><tr><th>时间</th><th>摘要</th></tr></thead>
+        <tbody>
+        {% for l in run_logs %}
+          <tr><td>{{ l.run_at }}</td><td>{{ l.summary }}</td></tr>
+        {% endfor %}
+        </tbody>
+      </table>
+    </section>
+  </main>
+</div>
+</body>
+</html>

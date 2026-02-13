@@ -1,0 +1,9 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel"><h2>运行日志</h2></div>
+<div class="panel">
+  <table><thead><tr><th>时间</th><th>摘要</th></tr></thead><tbody>
+  {% for l in run_logs %}<tr><td>{{ l.run_at }}</td><td>{{ l.summary }}</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

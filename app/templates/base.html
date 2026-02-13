@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{{ title or 'Emby 虚拟库控制台' }}</title>
+  <style>
+    :root{--panel:#111a2c;--card:#1a2540;--text:#d7e2ff;--muted:#8ea2d9;--accent:#4f8cff;--ok:#30c076;--warn:#f4b740;--danger:#f25f6b}
+    *{box-sizing:border-box} body{margin:0;font-family:Inter,system-ui;color:var(--text);background:linear-gradient(180deg,#090f1b,#0b1220)}
+    .layout{display:grid;grid-template-columns:240px 1fr;min-height:100vh}
+    .side{padding:20px;border-right:1px solid #1e2a48;background:#0d1628}
+    .brand{font-size:22px;font-weight:700;padding:8px 10px;border:1px solid #2a3a66;border-radius:10px;display:inline-block}
+    .nav{margin-top:20px;display:grid;gap:8px}.nav a{color:var(--muted);text-decoration:none;padding:10px 12px;border-radius:10px;display:block;background:#111a2c}
+    .nav a.active{background:var(--accent);color:#fff}
+    .main{padding:24px}.panel{background:var(--panel);border:1px solid #26375f;border-radius:14px;padding:14px;margin-bottom:14px}
+    .card{background:var(--card);border:1px solid #2b3c67;border-radius:14px;padding:14px}
+    .grid4{display:grid;grid-template-columns:repeat(4,minmax(160px,1fr));gap:12px}
+    .label{color:var(--muted);font-size:12px}.value{font-size:28px;font-weight:700;margin-top:6px}
+    input,select{width:100%;background:#0f1830;color:#dfe8ff;border:1px solid #29406f;border-radius:8px;padding:8px}
+    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:10px}.row3{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:10px}
+    table{width:100%;border-collapse:collapse;font-size:13px} th,td{padding:8px;border-bottom:1px solid #223355;text-align:left}
+    .btn{background:var(--accent);border:0;color:#fff;padding:10px 14px;border-radius:10px;cursor:pointer}
+    .mini{padding:6px 10px;border-radius:8px;border:0;cursor:pointer}.ok{background:var(--ok)}.warn{background:var(--warn)}.danger{background:var(--danger);color:#fff}
+    .muted{color:var(--muted)}
+  </style>
+</head>
+<body>
+<div class="layout">
+  <aside class="side">
+    <div class="brand">🎬 Emby Virtual</div>
+    <div class="nav">
+      <a href="/dashboard" class="{% if active=='dashboard' %}active{% endif %}">主界面</a>
+      <a href="/sources" class="{% if active=='sources' %}active{% endif %}">来源</a>
+      <a href="/rules" class="{% if active=='rules' %}active{% endif %}">规则</a>
+      <a href="/logs" class="{% if active=='logs' %}active{% endif %}">日志</a>
+      <a href="/settings" class="{% if active=='settings' %}active{% endif %}">系统设置</a>
+      <a href="/emby" class="{% if active=='emby' %}active{% endif %}">Emby联动</a>
+    </div>
+  </aside>
+  <main class="main">
+    {% block content %}{% endblock %}
+  </main>
+</div>
+</body>
+</html>

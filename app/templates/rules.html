@@ -1,0 +1,38 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel"><h2>规则管理</h2><div class="muted">新增、预览、行内编辑规则</div></div>
+<div class="panel">
+  <form method="post" action="/rules">
+    <div class="row"><input name="name" placeholder="规则名" required /><input name="target_subdir" placeholder="输出目录" required /></div>
+    <div class="row"><input name="source_ids" placeholder="来源ID列表，如 1,3" required /><input name="max_items" type="number" min="1" value="80" /></div>
+    <div class="row"><input name="include_keywords" placeholder="包含关键词" /><input name="exclude_keywords" placeholder="排除关键词" /></div>
+    <button class="btn" type="submit">新增规则</button>
+  </form>
+</div>
+<div class="panel">
+  <table><thead><tr><th>ID</th><th>规则</th><th>来源</th><th>状态</th><th>操作</th></tr></thead><tbody>
+  {% for r in rules %}
+  <tr>
+    <td>{{ r.id }}</td><td>{{ r.name }}<div class="muted">{{ r.target_subdir }}</div></td><td>{{ r.source_ids }}</td><td>{{ '启用' if r.enabled else '停用' }}</td>
+    <td>
+      <form method="post" action="/rules/{{ r.id }}/preview" style="display:inline"><button class="mini ok">预览</button></form>
+      <details style="display:inline-block"><summary class="mini" style="background:#4f8cff;color:#fff;list-style:none;cursor:pointer">编辑</summary>
+        <form method="post" action="/rules/{{ r.id }}/update" style="margin-top:6px;display:grid;gap:6px;min-width:280px">
+          <input name="name" value="{{ r.name }}" required />
+          <input name="target_subdir" value="{{ r.target_subdir }}" required />
+          <input name="source_ids" value="{{ r.source_ids }}" required />
+          <input name="include_keywords" value="{{ r.include_keywords or '' }}" />
+          <input name="exclude_keywords" value="{{ r.exclude_keywords or '' }}" />
+          <input type="number" min="1" name="max_items" value="{{ r.max_items }}" />
+          <button class="mini ok" type="submit">保存</button>
+        </form>
+      </details>
+      <form method="post" action="/rules/{{ r.id }}/toggle" style="display:inline"><button class="mini warn">切换</button></form>
+      <form method="post" action="/rules/{{ r.id }}/delete" style="display:inline" onsubmit="return confirm('删除该规则?')"><button class="mini danger">删除</button></form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+<div class="panel"><h3>最近规则预览</h3><div class="muted">{{ last_rule_preview or '暂无' }}</div></div>
+{% endblock %}

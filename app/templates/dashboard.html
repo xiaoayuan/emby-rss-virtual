@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel" style="display:flex;justify-content:space-between;align-items:center">
+  <div>
+    <h2 style="margin:0">媒体虚拟库控制台</h2>
+    <div class="muted">真实库：{{ media_root }} ｜ 虚拟库：{{ virtual_root }}</div>
+  </div>
+  <form method="post" action="/run"><button class="btn">立即刷新</button></form>
+</div>
+<div class="grid4">
+  <div class="card"><div class="label">RSS来源总数</div><div class="value">{{ sources|length }}</div></div>
+  <div class="card"><div class="label">启用来源</div><div class="value">{{ enabled_sources }}</div></div>
+  <div class="card"><div class="label">规则总数</div><div class="value">{{ rules|length }}</div></div>
+  <div class="card"><div class="label">启用规则</div><div class="value">{{ enabled_rules }}</div></div>
+</div>
+<div class="panel">
+  <h3>最近运行结果（{{ last_run or '尚未运行' }}）</h3>
+  <table><thead><tr><th>规则</th><th>链接数</th><th>错误数</th><th>输出路径</th></tr></thead><tbody>
+    {% for x in last_result %}<tr><td>{{ x.rule }}</td><td>{{ x.linked }}</td><td>{{ x.errors }}</td><td>{{ x.target }}</td></tr>{% endfor %}
+  </tbody></table>
+</div>
+{% endblock %}

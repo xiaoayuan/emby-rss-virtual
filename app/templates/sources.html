@@ -1,0 +1,47 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel"><h2>来源管理</h2><div class="muted">新增、测试、行内编辑来源</div></div>
+<div class="panel">
+  <form method="post" action="/sources">
+    <div class="row3">
+      <input name="name" placeholder="来源名称" required />
+      <select name="kind"><option value="rss">RSS</option><option value="tmdb">TMDB</option><option value="trakt">Trakt</option><option value="justwatch">JustWatch</option></select>
+      <input name="platform" placeholder="平台标签" />
+    </div>
+    <div class="row"><input name="rss_url" placeholder="URL/参数串" required /><button class="btn" type="submit">新增来源</button></div>
+  </form>
+  <div class="row">
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="netflix"><button class="mini ok">+ Netflix</button></form>
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="hbo"><button class="mini ok">+ HBO/Max</button></form>
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="disney"><button class="mini ok">+ Disney+</button></form>
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="appletv"><button class="mini ok">+ AppleTV+</button></form>
+  </div>
+</div>
+<div class="panel">
+  <table><thead><tr><th>ID</th><th>名称</th><th>平台</th><th>状态</th><th>操作</th></tr></thead><tbody>
+  {% for s in sources %}
+  <tr>
+    <td>{{ s.id }}</td><td>{{ s.name }}<div class="muted">{{ s.rss_url }}</div></td><td>{{ s.platform or '-' }}</td><td>{{ '启用' if s.enabled else '停用' }}</td>
+    <td>
+      <form method="post" action="/sources/{{ s.id }}/test" style="display:inline"><button class="mini ok">测试</button></form>
+      <details style="display:inline-block"><summary class="mini" style="background:#4f8cff;color:#fff;list-style:none;cursor:pointer">编辑</summary>
+        <form method="post" action="/sources/{{ s.id }}/update" style="margin-top:6px;display:grid;gap:6px;min-width:260px">
+          <input name="name" value="{{ s.name }}" required />
+          <select name="kind"><option value="rss" {% if s.kind=='rss' %}selected{% endif %}>RSS</option><option value="tmdb" {% if s.kind=='tmdb' %}selected{% endif %}>TMDB</option><option value="trakt" {% if s.kind=='trakt' %}selected{% endif %}>Trakt</option><option value="justwatch" {% if s.kind=='justwatch' %}selected{% endif %}>JustWatch</option></select>
+          <input name="platform" value="{{ s.platform or '' }}" />
+          <input name="rss_url" value="{{ s.rss_url or '' }}" />
+          <button class="mini ok" type="submit">保存</button>
+        </form>
+      </details>
+      <form method="post" action="/sources/{{ s.id }}/toggle" style="display:inline"><button class="mini warn">切换</button></form>
+      <form method="post" action="/sources/{{ s.id }}/delete" style="display:inline" onsubmit="return confirm('删除该来源?')"><button class="mini danger">删除</button></form>
+    </td>
+  </tr>
+  {% endfor %}
+  </tbody></table>
+</div>
+<div class="panel">
+  <h3>最近来源测试</h3>
+  <div class="muted">{{ last_source_test or '暂无' }}</div>
+</div>
+{% endblock %}

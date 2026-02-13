@@ -1,0 +1,17 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel"><h2>系统设置</h2></div>
+<div class="panel">
+  <form method="post" action="/system/settings">
+    <div class="row"><input name="cron_expr" value="{{ cron_expr }}" /><input name="max_scan_files" value="{{ max_scan_files }}" /></div>
+    <div class="row"><input name="video_exts" value="{{ video_exts }}" /><input name="tmdb_api_key" value="{{ tmdb_api_key }}" placeholder="TMDB API KEY" /></div>
+    <div class="row"><input name="trakt_client_id" value="{{ trakt_client_id }}" placeholder="TRAKT CLIENT ID" />
+      <select name="prefer_local_over_strm">
+        <option value="1" {% if prefer_local_over_strm=='1' %}selected{% endif %}>同名优先本地实体</option>
+        <option value="0" {% if prefer_local_over_strm!='1' %}selected{% endif %}>同名优先STRM</option>
+      </select>
+    </div>
+    <button class="btn" type="submit">保存系统设置</button>
+  </form>
+</div>
+{% endblock %}

@@ -1,0 +1,12 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="panel"><h2>Emby 联动</h2></div>
+<div class="panel">
+  <form method="post" action="/emby/settings">
+    <div class="row"><input name="emby_url" value="{{ emby_url }}" placeholder="http://NAS:8096" /><input name="emby_api_key" placeholder="Emby API Key" /></div>
+    <div class="row"><select name="emby_auto_refresh"><option value="0" {% if emby_auto_refresh!='1' %}selected{% endif %}>不自动刷新</option><option value="1" {% if emby_auto_refresh=='1' %}selected{% endif %}>自动刷新</option></select><button class="btn" type="submit">保存</button></div>
+  </form>
+  <form method="post" action="/emby/refresh"><button class="mini ok">立即触发 Emby 扫描</button></form>
+  <div class="muted" style="margin-top:8px">最近结果：{{ last_emby_refresh or '暂无' }}</div>
+</div>
+{% endblock %}

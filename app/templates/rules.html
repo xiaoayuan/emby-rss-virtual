@@ -2,6 +2,11 @@
 {% block content %}
 <div class="panel"><h2>规则管理</h2><div class="muted">新增、预览、行内编辑规则</div></div>
 <div class="panel">
+  <div class="row" style="margin-bottom:8px">
+    <form method="post" action="/rules/preset"><input type="hidden" name="code" value="hot_shows"><button class="mini ok">一键规则-热门剧集</button></form>
+    <form method="post" action="/rules/preset"><input type="hidden" name="code" value="hot_movies"><button class="mini ok">一键规则-热门电影</button></form>
+    <form method="post" action="/rules/preset"><input type="hidden" name="code" value="netflix_pool"><button class="mini ok">一键规则-奈飞内容池</button></form>
+  </div>
   <form method="post" action="/rules">
     <div class="row"><input name="name" placeholder="规则名" required /><input name="target_subdir" placeholder="输出目录" required /></div>
     <div class="row"><input name="source_ids" placeholder="来源ID列表，如 1,3" required /><input name="max_items" type="number" min="1" value="80" /></div>

@@ -57,6 +57,33 @@ PRESET_SOURCES = {
     "safe_tmdb_movie": {"name": "一键可用-热门电影(TMDB)", "kind": "tmdb", "rss_url": "media=movie&region=US&limit=30", "platform": "QuickStart"},
 }
 
+PRESET_RULES = {
+    "hot_shows": {
+        "name": "热门剧集",
+        "target_subdir": "rss-热门剧集",
+        "source_match": ["一键可用-热门剧集", "Trakt 热门剧集"],
+        "include_keywords": "",
+        "exclude_keywords": "",
+        "max_items": 60,
+    },
+    "hot_movies": {
+        "name": "热门电影",
+        "target_subdir": "rss-热门电影",
+        "source_match": ["一键可用-热门电影", "TMDB 热门电影"],
+        "include_keywords": "",
+        "exclude_keywords": "",
+        "max_items": 60,
+    },
+    "netflix_pool": {
+        "name": "奈飞内容池",
+        "target_subdir": "rss-奈飞内容池",
+        "source_match": ["Netflix", "JW港区奈飞"],
+        "include_keywords": "Netflix,奈飞,网飞",
+        "exclude_keywords": "预告,花絮",
+        "max_items": 80,
+    },
+}
+
 
 def _split_csv(s: str):
     return [x.strip() for x in (s or "").split(",") if x.strip()]
@@ -89,6 +116,7 @@ def _common_context(active: str = "dashboard"):
         "emby_auto_refresh": get_setting("emby_auto_refresh", "0"),
         "last_emby_refresh": state["last_emby_refresh"],
         "presets": PRESET_SOURCES,
+        "rule_presets": PRESET_RULES,
         "cron_expr": get_setting("cron_expr", os.getenv("CRON_EXPR", "30 3 * * *")),
         "tmdb_api_key": get_setting("tmdb_api_key", ""),
         "trakt_client_id": get_setting("trakt_client_id", ""),
@@ -266,6 +294,34 @@ def source_update(source_id: int, name: str = Form(...), kind: str = Form("rss")
 @app.post("/rules")
 def add_rule(name: str = Form(...), target_subdir: str = Form(...), source_ids: str = Form(...), include_keywords: str = Form(""), exclude_keywords: str = Form(""), max_items: int = Form(100)):
     create_rule(name, target_subdir, source_ids, include_keywords, exclude_keywords, max_items)
+    return RedirectResponse(url="/rules", status_code=303)
+
+
+@app.post("/rules/preset")
+def add_rule_preset(code: str = Form(...)):
+    p = PRESET_RULES.get(code)
+    if not p:
+        return RedirectResponse(url="/rules", status_code=303)
+
+    src = list_sources()
+    ids = []
+    for s in src:
+        n = (s.get("name") or "")
+        if any(k in n for k in p["source_match"]):
+            ids.append(str(s["id"]))
+
+    if not ids and src:
+        ids = [str(src[0]["id"])]
+
+    create_rule(
+        name=p["name"],
+        target_subdir=p["target_subdir"],
+        source_ids=",".join(ids),
+        include_keywords=p["include_keywords"],
+        exclude_keywords=p["exclude_keywords"],
+        max_items=int(p["max_items"]),
+    )
+    append_run_log(f"rule preset added: {code}")
     return RedirectResponse(url="/rules", status_code=303)
 
 

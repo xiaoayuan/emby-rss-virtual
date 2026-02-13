@@ -99,6 +99,19 @@ def _parse_ids(csv_text: str):
     return out
 
 
+def _parse_alias_map(raw: str) -> dict:
+    m = {}
+    for line in (raw or "").splitlines():
+        line = line.strip()
+        if not line or line.startswith("#"):
+            continue
+        if "=" in line:
+            k, v = line.split("=", 1)
+            if k.strip() and v.strip():
+                m[k.strip()] = v.strip()
+    return m
+
+
 def _common_context(active: str = "dashboard"):
     sources = list_sources()
     rules = list_rules()
@@ -122,6 +135,7 @@ def _common_context(active: str = "dashboard"):
         "trakt_client_id": get_setting("trakt_client_id", ""),
         "max_scan_files": get_setting("max_scan_files", "200000"),
         "video_exts": get_setting("video_exts", ".mkv,.mp4,.avi,.ts,.m2ts,.strm"),
+        "title_aliases": get_setting("title_aliases", ""),
         "prefer_local_over_strm": get_setting("prefer_local_over_strm", "1"),
         "last_source_test": state["last_source_test"],
         "last_rule_preview": state["last_rule_preview"],
@@ -157,6 +171,7 @@ def run_once():
     max_scan = int(get_setting("max_scan_files", str(cfg.settings.max_scan_files)) or cfg.settings.max_scan_files)
     video_exts = _split_csv(get_setting("video_exts", ",".join(cfg.settings.video_exts))) or cfg.settings.video_exts
     prefer_local = get_setting("prefer_local_over_strm", "1") == "1"
+    alias_map = _parse_alias_map(get_setting("title_aliases", ""))
 
     os.environ["TMDB_API_KEY"] = get_setting("tmdb_api_key", os.getenv("TMDB_API_KEY", ""))
     os.environ["TRAKT_CLIENT_ID"] = get_setting("trakt_client_id", os.getenv("TRAKT_CLIENT_ID", ""))
@@ -184,6 +199,7 @@ def run_once():
             include_keywords=_split_csv(rule.get("include_keywords", "")),
             exclude_keywords=_split_csv(rule.get("exclude_keywords", "")),
             limit=int(rule.get("max_items", 100)),
+            alias_map=alias_map,
         )
 
         class _R:
@@ -367,6 +383,7 @@ def save_system_settings(
     trakt_client_id: str = Form(""),
     max_scan_files: str = Form("200000"),
     video_exts: str = Form(".mkv,.mp4,.avi,.ts,.m2ts,.strm"),
+    title_aliases: str = Form(""),
     prefer_local_over_strm: str = Form("1"),
 ):
     set_setting("cron_expr", cron_expr.strip() or "30 3 * * *")
@@ -374,6 +391,7 @@ def save_system_settings(
     set_setting("trakt_client_id", trakt_client_id.strip())
     set_setting("max_scan_files", max_scan_files.strip() or "200000")
     set_setting("video_exts", video_exts.strip() or ".mkv,.mp4,.avi,.ts,.m2ts,.strm")
+    set_setting("title_aliases", title_aliases.strip())
     set_setting("prefer_local_over_strm", "1" if prefer_local_over_strm == "1" else "0")
 
     apply_schedule(run_once, get_setting("cron_expr", "30 3 * * *"))
@@ -411,6 +429,7 @@ def rule_preview(rule_id: int):
     max_scan = int(get_setting("max_scan_files", str(cfg.settings.max_scan_files)) or cfg.settings.max_scan_files)
     video_exts = _split_csv(get_setting("video_exts", ",".join(cfg.settings.video_exts))) or cfg.settings.video_exts
     prefer_local = get_setting("prefer_local_over_strm", "1") == "1"
+    alias_map = _parse_alias_map(get_setting("title_aliases", ""))
 
     os.environ["TMDB_API_KEY"] = get_setting("tmdb_api_key", os.getenv("TMDB_API_KEY", ""))
     os.environ["TRAKT_CLIENT_ID"] = get_setting("trakt_client_id", os.getenv("TRAKT_CLIENT_ID", ""))
@@ -437,6 +456,7 @@ def rule_preview(rule_id: int):
         include_keywords=_split_csv(rule.get("include_keywords", "")),
         exclude_keywords=_split_csv(rule.get("exclude_keywords", "")),
         limit=min(int(rule.get("max_items", 100)), 30),
+        alias_map=alias_map,
     )
 
     state["last_rule_preview"] = {

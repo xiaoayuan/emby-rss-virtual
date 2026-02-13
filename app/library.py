@@ -29,9 +29,17 @@ def scan_media_files(media_root: str, exts: List[str], max_scan: int) -> List[Me
     return out
 
 
-def match_titles_to_files(titles: List[str], files: List[MediaFile], include_keywords: List[str], exclude_keywords: List[str], limit: int) -> List[MediaFile]:
+def match_titles_to_files(
+    titles: List[str],
+    files: List[MediaFile],
+    include_keywords: List[str],
+    exclude_keywords: List[str],
+    limit: int,
+    alias_map: dict | None = None,
+) -> List[MediaFile]:
     include_keywords = [k.lower() for k in include_keywords]
     exclude_keywords = [k.lower() for k in exclude_keywords]
+    alias_map = alias_map or {}
 
     matched = []
     used = set()
@@ -45,10 +53,22 @@ def match_titles_to_files(titles: List[str], files: List[MediaFile], include_key
         if exclude_keywords and any(k in t_low for k in exclude_keywords):
             continue
 
+        candidates = [t_norm]
+        # 英文标题 -> 中文别名（或反向别名）兜底
+        for k, v in alias_map.items():
+            k_norm = norm(k)
+            v_norm = norm(v)
+            if t_norm == k_norm or k_norm in t_norm:
+                candidates.append(v_norm)
+            if t_norm == v_norm or v_norm in t_norm:
+                candidates.append(k_norm)
+
+        candidates = [c for c in dict.fromkeys(candidates) if c]
+
         for mf in files:
             if mf.path in used:
                 continue
-            if t_norm and (t_norm in mf.stem or mf.stem in t_norm):
+            if any(c in mf.stem or mf.stem in c for c in candidates):
                 matched.append(mf)
                 used.add(mf.path)
                 break

@@ -11,6 +11,10 @@
         <option value="0" {% if prefer_local_over_strm!='1' %}selected{% endif %}>同名优先STRM</option>
       </select>
     </div>
+    <div style="margin:10px 0">
+      <label class="muted">中英别名映射（每行一条：英文=中文）</label>
+      <textarea name="title_aliases" style="width:100%;min-height:120px;background:#0f1830;color:#dfe8ff;border:1px solid #29406f;border-radius:8px;padding:8px" placeholder="The Pitt=匹兹堡急诊室&#10;Fallout=辐射">{{ title_aliases }}</textarea>
+    </div>
     <button class="btn" type="submit">保存系统设置</button>
   </form>
 </div>

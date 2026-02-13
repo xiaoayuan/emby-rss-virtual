@@ -16,10 +16,12 @@ from .db import (
     create_source,
     toggle_source,
     delete_source,
+    update_source,
     list_rules,
     create_rule,
     toggle_rule,
     delete_rule,
+    update_rule,
     get_setting,
     set_setting,
     append_run_log,
@@ -276,6 +278,19 @@ def source_delete(source_id: int):
     return RedirectResponse(url="/", status_code=303)
 
 
+@app.post("/sources/{source_id}/update")
+def source_update(
+    source_id: int,
+    name: str = Form(...),
+    kind: str = Form("rss"),
+    rss_url: str = Form(""),
+    platform: str = Form(""),
+):
+    update_source(source_id, name, kind, rss_url, platform)
+    append_run_log(f"source updated: {source_id}")
+    return RedirectResponse(url="/", status_code=303)
+
+
 @app.post("/rules")
 def add_rule(
     name: str = Form(...),
@@ -298,6 +313,21 @@ def rule_toggle(rule_id: int):
 @app.post("/rules/{rule_id}/delete")
 def rule_delete(rule_id: int):
     delete_rule(rule_id)
+    return RedirectResponse(url="/", status_code=303)
+
+
+@app.post("/rules/{rule_id}/update")
+def rule_update(
+    rule_id: int,
+    name: str = Form(...),
+    target_subdir: str = Form(...),
+    source_ids: str = Form(...),
+    include_keywords: str = Form(""),
+    exclude_keywords: str = Form(""),
+    max_items: int = Form(100),
+):
+    update_rule(rule_id, name, target_subdir, source_ids, include_keywords, exclude_keywords, max_items)
+    append_run_log(f"rule updated: {rule_id}")
     return RedirectResponse(url="/", status_code=303)
 
 

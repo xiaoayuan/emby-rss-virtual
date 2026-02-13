@@ -85,6 +85,14 @@ def delete_source(source_id: int):
         c.execute("DELETE FROM sources WHERE id=?", (source_id,))
 
 
+def update_source(source_id: int, name: str, kind: str, rss_url: str, platform: str):
+    with conn() as c:
+        c.execute(
+            "UPDATE sources SET name=?, kind=?, rss_url=?, platform=? WHERE id=?",
+            (name.strip(), kind.strip() or "rss", (rss_url or "").strip(), (platform or "").strip(), source_id),
+        )
+
+
 def list_rules() -> List[Dict[str, Any]]:
     with conn() as c:
         rows = c.execute("SELECT * FROM rules ORDER BY id DESC").fetchall()
@@ -107,6 +115,14 @@ def toggle_rule(rule_id: int):
 def delete_rule(rule_id: int):
     with conn() as c:
         c.execute("DELETE FROM rules WHERE id=?", (rule_id,))
+
+
+def update_rule(rule_id: int, name: str, target_subdir: str, source_ids: str, include_keywords: str, exclude_keywords: str, max_items: int):
+    with conn() as c:
+        c.execute(
+            "UPDATE rules SET name=?, target_subdir=?, source_ids=?, include_keywords=?, exclude_keywords=?, max_items=? WHERE id=?",
+            (name.strip(), target_subdir.strip(), source_ids.strip(), include_keywords.strip(), exclude_keywords.strip(), max(1, int(max_items)), rule_id),
+        )
 
 
 def get_setting(key: str, default: str = "") -> str:

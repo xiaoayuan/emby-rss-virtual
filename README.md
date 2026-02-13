@@ -22,7 +22,7 @@ docker compose up -d --build
 ```
 
 启动后打开：
-- Web: http://你的NASIP:8080
+- Web: http://你的NASIP:5600
 - 健康检查: `/health`
 
 ## 2. Emby 里怎么用
@@ -67,7 +67,22 @@ Web 页面支持填写：
 
 也可手动点击“立即触发 Emby 扫描”。
 
-## 6. 注意事项
+## 6. 一键更新（NAS）
+
+首次给脚本执行权限：
+
+```bash
+chmod +x update.sh
+```
+
+后续每次更新：
+
+```bash
+cd /vol1/1000/docker/emby-rss-virtual
+./update.sh
+```
+
+## 7. 注意事项
 
 1. 当前匹配策略是“标题与文件名模糊匹配”（v1）。
 2. 预设 Netflix/HBO/Disney+/AppleTV 来源是占位示例 URL，请替换为可用 RSS。  

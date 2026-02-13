@@ -50,12 +50,13 @@ def fetch_tmdb_titles(param_text: str) -> List[str]:
     media = p.get("media", "tv")  # tv/movie
     region = p.get("region", "US")
     provider = p.get("provider", "")
+    sort_by = p.get("sort", "popularity.desc")
     limit = _to_int(p.get("limit", "30"), 30)
 
     url = f"https://api.themoviedb.org/3/discover/{media}"
     q = {
         "api_key": api_key,
-        "sort_by": "popularity.desc",
+        "sort_by": sort_by,
         "watch_region": region,
         "include_adult": "false",
         "page": 1,

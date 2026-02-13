@@ -11,6 +11,11 @@
     <div class="row"><input name="rss_url" placeholder="URL/参数串" required /><button class="btn" type="submit">新增来源</button></div>
   </form>
   <div class="row">
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="safe_trakt_hot"><button class="mini ok">一键可用-热门剧集(Trakt)</button></form>
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="safe_tmdb_tv"><button class="mini ok">一键可用-热门剧集(TMDB)</button></form>
+    <form method="post" action="/sources/preset"><input type="hidden" name="code" value="safe_tmdb_movie"><button class="mini ok">一键可用-热门电影(TMDB)</button></form>
+  </div>
+  <div class="row">
     <form method="post" action="/sources/preset"><input type="hidden" name="code" value="netflix"><button class="mini ok">+ Netflix</button></form>
     <form method="post" action="/sources/preset"><input type="hidden" name="code" value="hbo"><button class="mini ok">+ HBO/Max</button></form>
     <form method="post" action="/sources/preset"><input type="hidden" name="code" value="disney"><button class="mini ok">+ Disney+</button></form>

@@ -51,6 +51,10 @@ PRESET_SOURCES = {
     "tmdb_movie": {"name": "TMDB 热门电影", "kind": "tmdb", "rss_url": "media=movie&region=US&limit=30", "platform": "TMDB"},
     "jw_hk_netflix_popular": {"name": "JustWatch HK Netflix 热门", "kind": "justwatch", "rss_url": "country=HK&content=show&provider=nfx&mode=popular&limit=30", "platform": "JustWatch"},
     "jw_hk_netflix_latest": {"name": "JustWatch HK Netflix 最新", "kind": "justwatch", "rss_url": "country=HK&content=show&provider=nfx&mode=latest&limit=30", "platform": "JustWatch"},
+
+    "safe_trakt_hot": {"name": "一键可用-热门剧集(Trakt)", "kind": "trakt", "rss_url": "kind=shows&mode=trending&limit=30", "platform": "QuickStart"},
+    "safe_tmdb_tv": {"name": "一键可用-热门剧集(TMDB)", "kind": "tmdb", "rss_url": "media=tv&region=US&limit=30", "platform": "QuickStart"},
+    "safe_tmdb_movie": {"name": "一键可用-热门电影(TMDB)", "kind": "tmdb", "rss_url": "media=movie&region=US&limit=30", "platform": "QuickStart"},
 }
 
 

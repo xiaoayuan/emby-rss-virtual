@@ -103,6 +103,21 @@
               <td>{{ '启用' if s.enabled else '停用' }}</td>
               <td class="actions">
                 <form method="post" action="/sources/{{ s.id }}/test"><button class="mini ok">测试</button></form>
+                <details>
+                  <summary class="mini" style="background:#4f8cff;color:#fff;list-style:none;cursor:pointer">编辑</summary>
+                  <form method="post" action="/sources/{{ s.id }}/update" style="margin-top:6px;display:grid;gap:6px;min-width:260px">
+                    <input name="name" value="{{ s.name }}" required />
+                    <select name="kind">
+                      <option value="rss" {% if s.kind=='rss' %}selected{% endif %}>RSS</option>
+                      <option value="tmdb" {% if s.kind=='tmdb' %}selected{% endif %}>TMDB</option>
+                      <option value="trakt" {% if s.kind=='trakt' %}selected{% endif %}>Trakt</option>
+                      <option value="justwatch" {% if s.kind=='justwatch' %}selected{% endif %}>JustWatch</option>
+                    </select>
+                    <input name="platform" value="{{ s.platform or '' }}" placeholder="平台标签" />
+                    <input name="rss_url" value="{{ s.rss_url or '' }}" placeholder="URL/参数" />
+                    <button class="mini ok" type="submit">保存</button>
+                  </form>
+                </details>
                 <form method="post" action="/sources/{{ s.id }}/toggle"><button class="mini warn">切换</button></form>
                 <form method="post" action="/sources/{{ s.id }}/delete" onsubmit="return confirm('删除该来源?')"><button class="mini danger">删除</button></form>
               </td>
@@ -151,6 +166,18 @@
               <td>{{ '启用' if r.enabled else '停用' }}</td>
               <td class="actions">
                 <form method="post" action="/rules/{{ r.id }}/preview"><button class="mini ok">预览</button></form>
+                <details>
+                  <summary class="mini" style="background:#4f8cff;color:#fff;list-style:none;cursor:pointer">编辑</summary>
+                  <form method="post" action="/rules/{{ r.id }}/update" style="margin-top:6px;display:grid;gap:6px;min-width:280px">
+                    <input name="name" value="{{ r.name }}" required />
+                    <input name="target_subdir" value="{{ r.target_subdir }}" required />
+                    <input name="source_ids" value="{{ r.source_ids }}" required />
+                    <input name="include_keywords" value="{{ r.include_keywords or '' }}" placeholder="包含关键词" />
+                    <input name="exclude_keywords" value="{{ r.exclude_keywords or '' }}" placeholder="排除关键词" />
+                    <input type="number" min="1" name="max_items" value="{{ r.max_items }}" />
+                    <button class="mini ok" type="submit">保存</button>
+                  </form>
+                </details>
                 <form method="post" action="/rules/{{ r.id }}/toggle"><button class="mini warn">切换</button></form>
                 <form method="post" action="/rules/{{ r.id }}/delete" onsubmit="return confirm('删除该规则?')"><button class="mini danger">删除</button></form>
               </td>
